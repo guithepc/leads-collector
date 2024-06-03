@@ -14,6 +14,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +46,6 @@ public class ConnectionServiceImpl implements ConnectionService {
         WebElement funnels = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"app\"]/div/main/aside/div/div[2]/ul/li[5]")));
         funnels.click();
 
-
         return this.collectList(wait);
 
 
@@ -52,16 +54,45 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     public List<String> collectList(WebDriverWait wait){
         int j = 9;
+        List<String> finalList = new ArrayList<>();
+        try {
+            for (int i = 0; i < 299; i++){
+                List<String> list = this.loop(j, finalList, wait);
+                WebElement buttonNext = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"app\"]/div/main/div/div/section[2]/div/div[4]/div[2]/ul/li[7]/button/i")));
+                buttonNext.click();
+                finalList.addAll(list);
+                System.out.println(i);
+            }
+
+        }catch (TimeoutException e){
+            log.error(e.getMessage());
+        } finally {
+            this.saveToFile(finalList, "C:\\Users\\pctheone\\Documents\\Repositories\\leads-collector\\leads.txt");
+        }
+        return finalList;
+
+
+    }
+
+    public List<String> loop(int j, List<String> list, WebDriverWait wait){
         List<String> newList = new ArrayList<>();
+
         for (int i = 1; i< j ; i++){
             WebElement lead = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"app\"]/div/main/div/div/section[2]/div/div[3]/div[3]/div["+i+"]/div[2]/ul/li[1]/p")));
-            String a = lead.getText();
-            log.debug(lead.toString());
-            newList.add(a);
+            String email = lead.getText();
+            newList.add(email);
         }
-
-        log.debug(newList.toString());
         return newList;
+    }
 
+    public void saveToFile(List<String> emails, String filePath) {
+        String content = String.join(System.lineSeparator(), emails);
+
+        try {
+            Files.write(Paths.get(filePath), content.getBytes(), StandardOpenOption.CREATE);
+            System.out.println("E-mails salvos em: " + filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
