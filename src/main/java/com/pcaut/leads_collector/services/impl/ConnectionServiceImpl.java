@@ -39,8 +39,8 @@ public class ConnectionServiceImpl implements ConnectionService {
         WebElement funnels = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"app\"]/div/main/aside/div/div[2]/ul/li[4]/a/div/i")));
         funnels.click();
 
-        WebElement funilEscolhido = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"funnel-list-section\"]/div/div/div/div/div[1]/div[1]/div[2]/a")));
-        funilEscolhido.click();
+        WebElement chosenFunnel = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"funnel-list-section\"]/div/div/div/div/div[1]/div[1]/div[2]/a")));
+        chosenFunnel.click();
 
         return this.collectList(wait);
     }
@@ -49,6 +49,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         int j = 9;
         List<String> finalList = new ArrayList<>();
         try {
+            //Choose the number of pages to iterate
             for (int i = 0; i < 1300; i++){
                 List<String> list = this.loop(j, finalList, wait);
                 WebElement buttonNext = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"app\"]/div/main/div/div/section[2]/div/div[4]/div[2]/ul/li[7]/button/i")));
@@ -63,6 +64,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
+            //choose your folder to create the file
             this.saveToFile(finalList, "C:\\Users\\pctheone\\Documents\\Repositories\\leads-collector\\leads.txt");
         }
         return finalList;
@@ -84,7 +86,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         try {
             Files.write(Paths.get(filePath), content.getBytes(), StandardOpenOption.CREATE);
-            System.out.println("E-mails salvos em: " + filePath);
+            System.out.println("E-mails saved in: " + filePath);
         } catch (IOException e) {
             e.printStackTrace();
         }
